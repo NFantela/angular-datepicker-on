@@ -1,0 +1,1 @@
+export type MouseInitiateMoveOrEnd = MouseEvent | {inProcess:boolean};
