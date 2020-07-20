@@ -1,7 +1,7 @@
 import { Injectable, ElementRef, Inject } from '@angular/core';
-import { Observable, fromEvent, animationFrameScheduler } from 'rxjs';
+import { Observable, fromEvent } from 'rxjs';
 import {DOCUMENT} from '@angular/common';
-import { switchMapTo, takeUntil, endWith, startWith, auditTime} from 'rxjs/operators';
+import { switchMapTo, takeUntil, endWith, startWith, filter} from 'rxjs/operators';
 import { MouseInitiateMoveOrEnd } from '../models/timepicker-observable';
 
 
@@ -12,7 +12,6 @@ export class MouseDownUpService extends Observable<MouseInitiateMoveOrEnd> {
         @Inject(DOCUMENT) private _doc:Document
     ) {
         super((subscriber) => {
-            // todo
             if(!_doc) subscriber.error("No document");
             this.mouseMovementStream$.subscribe(subscriber);
         });
@@ -26,7 +25,8 @@ export class MouseDownUpService extends Observable<MouseInitiateMoveOrEnd> {
     mouseMovementStream$ = this._mouseDownStream$.pipe(
         switchMapTo(this._mouseMoveStream$.pipe(
             startWith({inProcess:true}),
-            auditTime(0, animationFrameScheduler),
+            // ignore mouse move events this could be used later maybe
+            filter(v => !(v instanceof MouseEvent)),
             takeUntil(this._mouseUpStream$),
             endWith({inProcess:false}),
         )),

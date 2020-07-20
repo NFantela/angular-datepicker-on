@@ -1,22 +1,75 @@
-import { Component, ChangeDetectionStrategy, Input } from '@angular/core';
-import { Subject } from 'rxjs';
+import { Component, ChangeDetectionStrategy, Input, ViewChild, 
+    ElementRef, OnDestroy, NgZone, Inject, AfterViewInit } from '@angular/core';
+import { Subject, fromEvent, merge, Subscription } from 'rxjs';
+import { pluck, pairwise, map, filter } from 'rxjs/operators';
+import { HoursOrMins } from '../models/hours-mins';
 
 @Component({
     selector: 'timepicker-circle',
     template: `
         <div>
-            Timepicker cirvle
-           <pre>
-           {{ (mouseVals | async)?.clientX }} 
-           </pre> 
+            <section #spanParent>
+                <span 
+                    *ngFor="let item of constHoursOrMinutes">
+                    {{item}}
+                    </span>
+            </section>
         </div>
     `,
     styleUrls:['timepicker-circle.component.css'],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class TimepickerCircleComponent {
-    constructor() {}
+export class TimepickerCircleComponent implements OnDestroy, AfterViewInit{
+
+    constructor(@Inject(NgZone) private _zone:NgZone) {}
+
+    constHoursOrMinutes:Number[] = [];
+
+    @ViewChild('spanParent') spanParent:ElementRef;
 
     @Input()
-    public mouseVals:Subject<MouseEvent>;
+    mouseEnterActiveTarget:Subject<number>;
+
+    private _mouseOverSub:Subscription;
+
+    @Input()
+    set hoursOrMins(val:HoursOrMins){
+        if(val){
+            // TODO FIX this to true values
+            let repetitions = 0; 
+            val === 'hours' ? repetitions = 24: repetitions = 10;
+            while (repetitions >= 0 ){
+                this.constHoursOrMinutes.push(repetitions);
+                repetitions --;
+            }
+            this._hoursOrMins = val;
+        }
+    }
+    get hoursOrMins(){return this._hoursOrMins; }
+    private _hoursOrMins:HoursOrMins;
+
+    ngAfterViewInit(){
+        // capture mouseover and mouseout events on parent el and using
+        // ev delegation grab hovered span elements
+        this._zone.runOutsideAngular(() => 
+            this._mouseOverSub = merge( 
+                fromEvent(this.spanParent.nativeElement, 'mouseover') , 
+                fromEvent(this.spanParent.nativeElement, 'mouseout')
+            ).pipe(
+                filter((ev:MouseEvent) => (<HTMLElement>ev.target).nodeName === 'SPAN'),
+                pluck('target', 'innerHTML'),
+                pairwise(),
+                map(([prevVal, currVal]:[string, string]) => {
+                    if(prevVal === currVal){
+                        return NaN;
+                    }
+                    return parseInt(currVal, 10);
+                }),
+            ).subscribe(v => this.mouseEnterActiveTarget.next(v))
+        );
+    }
+
+    ngOnDestroy(){
+        this._mouseOverSub && this._mouseOverSub.unsubscribe();
+    }
 }
