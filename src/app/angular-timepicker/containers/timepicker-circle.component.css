@@ -1,11 +1,77 @@
 :host{
     display: block;
-    min-width: 280px;
-    min-height: 280px;
+    width: 280px;
+    height: 280px;
     position: absolute;
     z-index: 1;
-    background-color: black;
-    color:wheat;
-    border-radius: 50%;
     padding:1em;
 }
+
+
+/** clock styles **/
+.clock{
+  position: relative;
+  width: 210px;
+  height: 210px;
+  margin: 2em auto;
+  border-radius: 50%;
+  background-color:#fff;
+  box-shadow: rgba(0,0,0,.8) 0.3em 0.3em 2em;
+}
+.clock .digits {
+  width: 210px;
+  height: 210px;
+  border-radius: 50%;
+  position: absolute;
+  top: 0;
+  left: 50%;
+  margin-left: -105px;
+padding:0;
+}
+
+.clock .digits li{
+  font-size: 12px;
+  display: block;
+  width: 12px;
+  height: 12px;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  line-height: 1em;
+  text-align: center;
+  margin: -2.2em 0 0 -.9em;
+  font-weight: bold;
+  border-radius:50px;
+  padding:.4em;
+}
+.clock .digits li:hover{
+  cursor:pointer!important;
+  background-color:gray;
+}
+/* .clock .digits li:nth-child(1) { transform:translate(3.9em, -6.9em) }
+.clock .digits li:nth-child(2) { transform:translate(6.9em, -4em) }
+.clock .digits li:nth-child(3) { transform:translate(8em, 0) }
+.clock .digits li:nth-child(4) { transform:translate(6.8em, 4em) }
+.clock .digits li:nth-child(5) { transform:translate(3.9em, 6.9em) }
+.clock .digits li:nth-child(6) { transform:translate(0, 8em) }
+.clock .digits li:nth-child(7) { transform:translate(-3.9em, 6.9em) }
+.clock .digits li:nth-child(8) { transform:translate(-6.8em, 4em) }
+.clock .digits li:nth-child(9) { transform:translate(-8em, 0) }
+.clock .digits li:nth-child(10) { transform:translate(-6.9em, -4em) }
+.clock .digits li:nth-child(11) { transform:translate(-3.9em, -6.9em) }
+.clock .digits li:nth-child(12) { transform:translate(0, -8em) } */
+
+ /** 6.9 > 5.9    3.9 > 2.9   4 > 3    6.8 > 5.8     8 > 7*/
+
+.clock .digits li:nth-child(1) { transform:translate(2.9em, -5.9em) }
+.clock .digits li:nth-child(2) { transform:translate(5.9em, -3em) }
+.clock .digits li:nth-child(3) { transform:translate(7em, 0) }
+.clock .digits li:nth-child(4) { transform:translate(5.8em, 3em) }
+.clock .digits li:nth-child(5) { transform:translate(2.9em, 5.9em) }
+.clock .digits li:nth-child(6) { transform:translate(0, 7em) }
+.clock .digits li:nth-child(7) { transform:translate(-2.9em, 5.9em) }
+.clock .digits li:nth-child(8) { transform:translate(-5.8em, 3em) }
+.clock .digits li:nth-child(9) { transform:translate(-7em, 0) }
+.clock .digits li:nth-child(10) { transform:translate(-5.9em, -3em) }
+.clock .digits li:nth-child(11) { transform:translate(-2.9em, -5.9em) }
+.clock .digits li:nth-child(12) { transform:translate(0, -7em) }

@@ -6,16 +6,7 @@ import { HoursOrMins } from '../models/hours-mins';
 
 @Component({
     selector: 'timepicker-circle',
-    template: `
-        <div>
-            <section #spanParent>
-                <span 
-                    *ngFor="let item of constHoursOrMinutes">
-                    {{item}}
-                    </span>
-            </section>
-        </div>
-    `,
+    templateUrl: 'timepicker-circle.component.html',
     styleUrls:['timepicker-circle.component.css'],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
@@ -25,7 +16,7 @@ export class TimepickerCircleComponent implements OnDestroy, AfterViewInit{
 
     constHoursOrMinutes:Number[] = [];
 
-    @ViewChild('spanParent') spanParent:ElementRef;
+    @ViewChild('clockParentList') clockParentList:ElementRef;
 
     @Input()
     mouseEnterActiveTarget:Subject<number>;
@@ -35,12 +26,11 @@ export class TimepickerCircleComponent implements OnDestroy, AfterViewInit{
     @Input()
     set hoursOrMins(val:HoursOrMins){
         if(val){
+            let repetitions = 1; 
+            val === 'hours' ? repetitions = 23: repetitions = 12;
             // TODO FIX this to true values
-            let repetitions = 0; 
-            val === 'hours' ? repetitions = 24: repetitions = 10;
-            while (repetitions >= 0 ){
-                this.constHoursOrMinutes.push(repetitions);
-                repetitions --;
+            for(let i = 1; i <= repetitions; i++) {
+                this.constHoursOrMinutes.push(i);
             }
             this._hoursOrMins = val;
         }
@@ -53,10 +43,10 @@ export class TimepickerCircleComponent implements OnDestroy, AfterViewInit{
         // ev delegation grab hovered span elements
         this._zone.runOutsideAngular(() => 
             this._mouseOverSub = merge( 
-                fromEvent(this.spanParent.nativeElement, 'mouseover') , 
-                fromEvent(this.spanParent.nativeElement, 'mouseout')
+                fromEvent(this.clockParentList.nativeElement, 'mouseover') , 
+                fromEvent(this.clockParentList.nativeElement, 'mouseout')
             ).pipe(
-                filter((ev:MouseEvent) => (<HTMLElement>ev.target).nodeName === 'SPAN'),
+                filter((ev:MouseEvent) => (<HTMLElement>ev.target).nodeName === 'LI'),
                 pluck('target', 'innerHTML'),
                 pairwise(),
                 map(([prevVal, currVal]:[string, string]) => {

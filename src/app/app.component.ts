@@ -4,11 +4,14 @@ import { FormControl } from '@angular/forms';
 @Component({
   selector: 'app-root',
   template: `
-    <h1>Angular timepicker </h1>
-    <h3>Regular input field </h3>
-    <input type="number" ang-timepicker  />
-    <p>Field with form control</p>
-    <input ang-timepicker [formControl]="timeInput" hoursOrMins="mins" />
+  <div class="wrap">
+  <h1>Angular timepicker </h1>
+  <h3>Regular input field </h3>
+  <input type="number" ang-timepicker  />
+  <p>Field with form control</p>
+  <input ang-timepicker [formControl]="timeInput" hoursOrMins="mins" />
+  </div>
+
   
   `,
   styleUrls: ['./app.component.css']
