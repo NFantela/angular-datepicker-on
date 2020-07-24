@@ -67,6 +67,10 @@ import { HoursOrMins } from '../models/hours-mins';
         this._innerTimeChangeSub && this._innerTimeChangeSub.unsubscribe();
     }
 
+    ngAfterViewChecked(){
+        console.log("checking AngularTimepickerDirective" )
+    }
+
 
     private _updateFormField(val:number, formControl = null){
         if(formControl){

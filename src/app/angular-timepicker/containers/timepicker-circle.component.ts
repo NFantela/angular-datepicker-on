@@ -1,8 +1,10 @@
 import { Component, ChangeDetectionStrategy, Input, ViewChild, 
     ElementRef, OnDestroy, NgZone, Inject, AfterViewInit } from '@angular/core';
-import { Subject, fromEvent, merge, Subscription } from 'rxjs';
+import { Subject, merge, Subscription } from 'rxjs';
 import { pluck, pairwise, map, filter } from 'rxjs/operators';
 import { HoursOrMins } from '../models/hours-mins';
+import { IsMobileService } from '../services/is-mobile.service';
+import { typedFromEvent } from '../utils/type-safe-from-event';
 
 @Component({
     selector: 'timepicker-circle',
@@ -12,7 +14,10 @@ import { HoursOrMins } from '../models/hours-mins';
 })
 export class TimepickerCircleComponent implements OnDestroy, AfterViewInit{
 
-    constructor(@Inject(NgZone) private _zone:NgZone) {}
+    constructor(
+        @Inject(NgZone) private _zone:NgZone,
+        @Inject(IsMobileService) private _isMobileService : IsMobileService,
+        ) {}
 
     constHoursOrMinutes:Number[] = [];
 
@@ -41,22 +46,24 @@ export class TimepickerCircleComponent implements OnDestroy, AfterViewInit{
     ngAfterViewInit(){
         // capture mouseover and mouseout events on parent el and using
         // ev delegation grab hovered span elements
-        this._zone.runOutsideAngular(() => 
-            this._mouseOverSub = merge( 
-                fromEvent(this.clockParentList.nativeElement, 'mouseover') , 
-                fromEvent(this.clockParentList.nativeElement, 'mouseout')
-            ).pipe(
-                filter((ev:MouseEvent) => (<HTMLElement>ev.target).nodeName === 'LI'),
-                pluck('target', 'innerHTML'),
-                pairwise(),
-                map(([prevVal, currVal]:[string, string]) => {
-                    if(prevVal === currVal){
-                        return NaN;
-                    }
-                    return parseInt(currVal, 10);
-                }),
-            ).subscribe(v => this.mouseEnterActiveTarget.next(v))
-        );
+        this._zone.runOutsideAngular(() => {
+
+            if(this._isMobileService._isMobile){
+                // TODO
+            } else {
+                this._mouseOverSub = merge( 
+                    typedFromEvent(this.clockParentList.nativeElement, 'mouseover') , 
+                    typedFromEvent(this.clockParentList.nativeElement, 'mouseout')
+                ).pipe(
+                    filter((ev) => (<HTMLElement>ev.target).nodeName === 'LI'),
+                    pluck('target', 'innerHTML'),
+                    map((currVal) => {
+                        return parseInt(currVal, 10);
+                    }),
+                ).subscribe(v => this.mouseEnterActiveTarget.next(v))
+            }
+
+        });
     }
 
     ngOnDestroy(){
